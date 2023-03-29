@@ -4,3 +4,6 @@ requests
 gspread
 oauth2client
 pandas
+altair
+zipfile
+plotly.express
