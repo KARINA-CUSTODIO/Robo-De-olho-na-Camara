@@ -52,7 +52,7 @@ def sobre():
 def contato():
   return menu + "Aqui vai o conteúdo da página Contato"
 
-@app.route("Telegram")
+@app.route("/Telegram")
 def index():
   return menu + "Aqui vai o conteúdo da página Telegram"
 
