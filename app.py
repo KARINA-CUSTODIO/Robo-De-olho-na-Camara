@@ -35,9 +35,26 @@ baixar_arquivo('https://www.camara.leg.br/cotas/Ano-2022.csv.zip','CSV')
 #lendo arquivo  
 with zipfile.ZipFile('CSV') as z:
   with z.open('Ano-2022.csv') as f:
-    despesas = pd.read_csv(f, sep=';', skiprows = [i for i in range(1, 515) ])
-
+    despesas = pd.read_csv(f, sep=';', skiprows = [i for i in range(1, 515) ])    
+    
 app = Flask(__name__)
+
+menu = """
+<a href="/">Página inicial</a> | <a href="/sobre">Sobre</a> | <a href="/gastos">Gastos</a> | <a href="/contato">Contato</a> | <a href="/telegram">Telegram</a>
+<br>
+"""
+
+@app.route("/sobre")
+def sobre():
+  return menu + "Aqui vai o conteúdo da página Sobre"
+
+@app.route("/contato")
+def contato():
+  return menu + "Aqui vai o conteúdo da página Contato"
+
+@app.route("Telegram")
+def index():
+  return menu + "Aqui vai o conteúdo da página Telegram"
 
 @app.route("/")
 def hello_world():
