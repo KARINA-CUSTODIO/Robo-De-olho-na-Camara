@@ -92,7 +92,7 @@ estado_Pls = PLs_estados.iloc[0]['siglaUFAutor']
 
 #Criando robô no Telegram***
 
-#Configurando acesso ao Telegram e Google sheets**
+#Configurando acesso ao Telegram e Google sheets
 
 TELEGRAM_API_KEY = os.environ["TELEGRAM_API_KEY"]
 GOOGLE_SHEETS_CREDENTIALS = os.environ["GOOGLE_SHEETS_CREDENTIALS"]
@@ -102,49 +102,6 @@ conta = ServiceAccountCredentials.from_json_keyfile_name("credenciais.json")
 api = gspread.authorize(conta)
 planilha = api.open_by_key("1BTcO4G_FS1tp6_hRcPUk_4fts6ayt7Ms2cvYHsqD9nM")
 sheet = planilha.worksheet("dadosrobo")
-
-resposta = requests.get(f"https://api.telegram.org/bot{token}/getMe")
-print(resposta.json())
-
-try:
-  valores = sheet.get("A1")
-except KeyError:  # Planilha em branco
-  print("Planilha em branco, usando 0 como update_id")
-  update_id = 0
-  sheet.update("A1", update_id)
-else:
-  update_id = int(valores[0][0])
-  print(f"Planilha já preenchida com o valor {update_id}")
-
-  #requisição
-  resposta = requests.get(f"https://api.telegram.org/bot{token}/getUpdates?offset={update_id + 1}")
-dados = resposta.json()["result"]  # lista de dicionários (cada dict é um "update")
-print(f"Temos {len(dados)} novas atualizações:")
-for update in dados:
-  update_id = update["update_id"]
-
-  # Extrai dados de quem enviou a mensagem
-  first_name = update["message"]["from"]["first_name"]
-  sender_id = update["message"]["from"]["id"]
-  if "text" not in update["message"]:
-    continue  # Essa mensagem não é um texto!
-  message = update["message"]["text"]
-  chat_id = update["message"]["chat"]["id"]
-
-  # Define qual será a resposta e enviada
-  if message == "oi":
-    texto_resposta = f"Olá! Seja bem-vinda(o) {first_name}! O que gostaria de saber? \n 1 - Gastos dos deputados Federais no último ano? \n 2 - Projetos de Lei apresentados na Câmara Federal no último ano?"
-  elif message == "/start":
-    texto_resposta = f"Olá! Seja bem-vinda(o) {first_name}! O que gostaria de saber? \n 1 - Gastos dos deputados Federais no último ano? \n 2 - Projetos de Lei apresentados na Câmara Federal no último ano?"
-  elif message =='1':
-    texto_resposta =f"{first_name}, No último ano, o total gasto pelos(as) deputados(as) federais foi igual à R${gastos}. \n A média de gastos da cota parlamentar por deputado(a) foi de R${mediaBr}, o(a) deputado(a) que mais gastou foi {maiorgastador}, o(a) que menos gastou foi {menorgastador}."
-  elif message =='2':
-    texto_resposta =f"{first_name}, Foram apresentados {qtd_proposicoes} projetos de Lei na Câmara Federal no último ano. \n Em média, o estado que mais apresentou PLs foi {estado_Pls}, o(a) deputado(a) que mais apresentou PLs foi {maior_autor}, já o que menos apresentou foi {menor_autor}"
-  else:
-    texto_resposta = "Não entendi!"
-  nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
-  requests.post(f"https://api.telegram.org./bot{token}/sendMessage", data=nova_mensagem)
-  sheet.update("A1", update_id)
 
 # Criando site
   
@@ -163,7 +120,7 @@ def sobre():
 def contato():
   return menu + "Aqui vai o conteúdo da página Contato"
 
-@app.route("/Telegram")
+@app.route("/telegram")
 def index():
   return menu + "Aqui vai o conteúdo da página Telegram"
 
