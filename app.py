@@ -10,7 +10,7 @@ import zipfile
 import altair as alt
 import plotly.express as px
 
-***Analisando gastos CEAP deputados Federais***
+#Analisando gastos CEAP deputados Federais
 
 #Criando função que baixa arquivo
 def baixar_arquivo(url, endereco):
@@ -62,7 +62,7 @@ estadosBr.sort_values(ascending=False)
 estados = pd.DataFrame(estadosBr)
 estados = estados.reset_index()
 
-***Analisando Projetos de Lei***
+#Analisando Projetos de Lei
 
 baixar_arquivo('https://dadosabertos.camara.leg.br/arquivos/proposicoesAutores/csv/proposicoesAutores-2022.csv','proposicoesAutores-2022.csv')
 proposicoes = pd.read_csv('proposicoesAutores-2022.csv',
@@ -90,9 +90,9 @@ PLs_estados = PLs_estados.reset_index()
 #mostrar estado que tem maior quantidade de PLs
 estado_Pls = PLs_estados.iloc[0]['siglaUFAutor']
 
-***Criando robô no Telegram***
+#Criando robô no Telegram***
 
-***Configurando acesso ao Telegram e Google sheets**
+#Configurando acesso ao Telegram e Google sheets**
 
 TELEGRAM_API_KEY = os.environ["TELEGRAM_API_KEY"]
 GOOGLE_SHEETS_CREDENTIALS = os.environ["GOOGLE_SHEETS_CREDENTIALS"]
@@ -146,7 +146,7 @@ for update in dados:
   requests.post(f"https://api.telegram.org./bot{token}/sendMessage", data=nova_mensagem)
   sheet.update("A1", update_id)
 
-***Criando site***
+# Criando site
   
 app = Flask(__name__)
 
