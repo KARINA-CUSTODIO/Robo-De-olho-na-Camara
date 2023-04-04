@@ -10,14 +10,7 @@ import zipfile
 import altair as alt
 import plotly.express as px
 
-TELEGRAM_API_KEY = os.environ["TELEGRAM_API_KEY"]
-GOOGLE_SHEETS_CREDENTIALS = os.environ["GOOGLE_SHEETS_CREDENTIALS"]
-with open("credenciais.json", mode="w") as arquivo:
-  arquivo.write(GOOGLE_SHEETS_CREDENTIALS)
-conta = ServiceAccountCredentials.from_json_keyfile_name("credenciais.json")
-api = gspread.authorize(conta)
-planilha = api.open_by_key("1BTcO4G_FS1tp6_hRcPUk_4fts6ayt7Ms2cvYHsqD9nM")
-sheet = planilha.worksheet("dadosrobo")
+***Analisando gastos CEAP deputados Federais***
 
 #Criando função que baixa arquivo
 def baixar_arquivo(url, endereco):
@@ -35,8 +28,126 @@ baixar_arquivo('https://www.camara.leg.br/cotas/Ano-2022.csv.zip','CSV')
 #lendo arquivo  
 with zipfile.ZipFile('CSV') as z:
   with z.open('Ano-2022.csv') as f:
-    despesas = pd.read_csv(f, sep=';', skiprows = [i for i in range(1, 515) ])    
+    despesas = pd.read_csv(f, sep=';', skiprows = [i for i in range(1, 515) ])
     
+#tratando dados
+despesas['numMes'] = despesas['numMes'].astype(int)
+
+#fazendo analises
+gastos = despesas['vlrLiquido'].sum()
+
+#Quais deputados mais gastaram?
+gastadores = despesas.groupby(['txNomeParlamentar', 'sgUF'])['vlrLiquido'].sum()
+gastadoresBR_top10 = gastadores.nlargest(10)
+gastadoresBR_top10 = pd.DataFrame(gastadoresBR_top10)
+gastadoresBR_top10 = gastadoresBR_top10.reset_index()
+
+#Deputado/a que mais gastou
+maiorgastador = gastadoresBR_top10.iloc[0]['txNomeParlamentar']
+
+#Deputado/as que menos gastaram
+gastadores = despesas.groupby(['txNomeParlamentar', 'sgUF'])['vlrLiquido'].sum()
+gastadores = pd.DataFrame(gastadores)
+gastadores = gastadores.sort_values(by='vlrLiquido')
+gastadores = gastadores.reset_index()
+menorgastador = gastadores.iloc[0]['txNomeParlamentar']
+
+#Qual a média de gastos por deputado/a?
+mediaBr = despesas['vlrLiquido'].mean()
+mediaBr = "{:.2f}".format(mediaBr)
+
+#Média de Gastos de deputados por estado
+estadosBr = despesas.groupby('sgUF')['vlrLiquido'].mean()
+estadosBr.sort_values(ascending=False)
+estados = pd.DataFrame(estadosBr)
+estados = estados.reset_index()
+
+***Analisando Projetos de Lei***
+
+baixar_arquivo('https://dadosabertos.camara.leg.br/arquivos/proposicoesAutores/csv/proposicoesAutores-2022.csv','proposicoesAutores-2022.csv')
+proposicoes = pd.read_csv('proposicoesAutores-2022.csv',
+                          sep = ';')
+
+#Quais deputados/as mais apresentaram PLs?
+autores = proposicoes.groupby('nomeAutor').count()
+autores = pd.DataFrame(autores)
+autores = autores.sort_values(by='idProposicao', ascending = False)
+autores = autores.reset_index()
+
+maior_autor = autores.iloc[0]['nomeAutor']
+
+menor_autor = autores.iloc[-1]['nomeAutor']
+
+#Quantos projetos foram apresentados em 2022?
+qtd_proposicoes = proposicoes['idProposicao'].count()
+
+#PLs por estado
+PLs_estados = proposicoes.groupby('siglaUFAutor')['idProposicao'].mean()
+PLs_estados = PLs_estados.sort_values(ascending=False)
+PLs_estados = pd.DataFrame(PLs_estados)
+PLs_estados = PLs_estados.reset_index()
+
+#mostrar estado que tem maior quantidade de PLs
+estado_Pls = PLs_estados.iloc[0]['siglaUFAutor']
+
+***Criando robô no Telegram***
+
+***Configurando acesso ao Telegram e Google sheets**
+
+TELEGRAM_API_KEY = os.environ["TELEGRAM_API_KEY"]
+GOOGLE_SHEETS_CREDENTIALS = os.environ["GOOGLE_SHEETS_CREDENTIALS"]
+with open("credenciais.json", mode="w") as arquivo:
+  arquivo.write(GOOGLE_SHEETS_CREDENTIALS)
+conta = ServiceAccountCredentials.from_json_keyfile_name("credenciais.json")
+api = gspread.authorize(conta)
+planilha = api.open_by_key("1BTcO4G_FS1tp6_hRcPUk_4fts6ayt7Ms2cvYHsqD9nM")
+sheet = planilha.worksheet("dadosrobo")
+
+resposta = requests.get(f"https://api.telegram.org/bot{token}/getMe")
+print(resposta.json())
+
+try:
+  valores = sheet.get("A1")
+except KeyError:  # Planilha em branco
+  print("Planilha em branco, usando 0 como update_id")
+  update_id = 0
+  sheet.update("A1", update_id)
+else:
+  update_id = int(valores[0][0])
+  print(f"Planilha já preenchida com o valor {update_id}")
+
+  #requisição
+  resposta = requests.get(f"https://api.telegram.org/bot{token}/getUpdates?offset={update_id + 1}")
+dados = resposta.json()["result"]  # lista de dicionários (cada dict é um "update")
+print(f"Temos {len(dados)} novas atualizações:")
+for update in dados:
+  update_id = update["update_id"]
+
+  # Extrai dados de quem enviou a mensagem
+  first_name = update["message"]["from"]["first_name"]
+  sender_id = update["message"]["from"]["id"]
+  if "text" not in update["message"]:
+    continue  # Essa mensagem não é um texto!
+  message = update["message"]["text"]
+  chat_id = update["message"]["chat"]["id"]
+
+  # Define qual será a resposta e enviada
+  if message == "oi":
+    texto_resposta = f"Olá! Seja bem-vinda(o) {first_name}! O que gostaria de saber? \n 1 - Gastos dos deputados Federais no último ano? \n 2 - Projetos de Lei apresentados na Câmara Federal no último ano?"
+  elif message == "/start":
+    texto_resposta = f"Olá! Seja bem-vinda(o) {first_name}! O que gostaria de saber? \n 1 - Gastos dos deputados Federais no último ano? \n 2 - Projetos de Lei apresentados na Câmara Federal no último ano?"
+  elif message =='1':
+    texto_resposta =f"{first_name}, No último ano, o total gasto pelos(as) deputados(as) federais foi igual à R${gastos}. \n A média de gastos da cota parlamentar por deputado(a) foi de R${mediaBr}, o(a) deputado(a) que mais gastou foi {maiorgastador}, o(a) que menos gastou foi {menorgastador}."
+  elif message =='2':
+    texto_resposta =f"{first_name}, Foram apresentados {qtd_proposicoes} projetos de Lei na Câmara Federal no último ano. \n Em média, o estado que mais apresentou PLs foi {estado_Pls}, o(a) deputado(a) que mais apresentou PLs foi {maior_autor}, já o que menos apresentou foi {menor_autor}"
+  else:
+    texto_resposta = "Não entendi!"
+  nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
+  requests.post(f"https://api.telegram.org./bot{token}/sendMessage", data=nova_mensagem)
+  sheet.update("A1", update_id)
+
+***Criando site***
+  
 app = Flask(__name__)
 
 menu = """
