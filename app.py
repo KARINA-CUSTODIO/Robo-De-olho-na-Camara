@@ -103,6 +103,26 @@ api = gspread.authorize(conta)
 planilha = api.open_by_key("1BTcO4G_FS1tp6_hRcPUk_4fts6ayt7Ms2cvYHsqD9nM")
 sheet = planilha.worksheet("dadosrobo")
 
+# Criando site
+  
+app = Flask(__name__)
+
+menu = """
+<a href="/">Página inicial</a> | <a href="/sobre">Sobre</a> | <a href="/gastos">Gastos</a> | <a href="/contato">Contato</a> | <a href="/telegram">Telegram</a>
+<br>
+"""
+
+@app.route("/sobre")
+conteudo = menu + """
+def sobre():
+  return menu + "Aqui vai o conteúdo da página Sobre"
+
+@app.route("/contato")
+conteudo = menu + """
+def contato():
+  return menu + "Aqui vai o conteúdo da página Contato"
+
+@app.route("/telegram", methods=["POST"])
 def telegram_bot():
   #extraindo dados para enviar mensagens
   update = request.json
@@ -125,27 +145,6 @@ def telegram_bot():
  
   resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
   print(resposta.text)
-
-# Criando site
-  
-app = Flask(__name__)
-
-menu = """
-<a href="/">Página inicial</a> | <a href="/sobre">Sobre</a> | <a href="/gastos">Gastos</a> | <a href="/contato">Contato</a> | <a href="/telegram">Telegram</a>
-<br>
-"""
-
-@app.route("/sobre")
-def sobre():
-  return menu + "Aqui vai o conteúdo da página Sobre"
-
-@app.route("/contato")
-def contato():
-  return menu + "Aqui vai o conteúdo da página Contato"
-
-@app.route("/telegram")
-def index():
-  return menu + "Aqui vai o conteúdo da página Telegram"
 
 @app.route("/")
 def hello_world():
