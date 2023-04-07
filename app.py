@@ -66,7 +66,7 @@ estados = estados.reset_index()
 
 baixar_arquivo('https://dadosabertos.camara.leg.br/arquivos/proposicoesAutores/csv/proposicoesAutores-2022.csv','proposicoesAutores-2022.csv')
 proposicoes = pd.read_csv('proposicoesAutores-2022.csv',
-                          sep = ';')
+                          sep = ';', low_memory=False)
 
 #Quais deputados/as mais apresentaram PLs?
 autores = proposicoes.groupby('nomeAutor').count()
