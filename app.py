@@ -125,6 +125,7 @@ def telegram_bot():
   #extraindo dados para enviar mensagens
   update = request.json
   chat_id = update["message"]["chat"]["id"]
+  message = update["message"]["text"]
   first_name = update["message"]["from"]["first_name"]
   sender_id = update["message"]["from"]["id"]
 
