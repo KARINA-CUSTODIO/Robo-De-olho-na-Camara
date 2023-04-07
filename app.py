@@ -125,7 +125,6 @@ def telegram_bot():
   #extraindo dados para enviar mensagens
   update = request.json
   chat_id = update["message"]["chat"]["id"]
-  message = update["message"]["text"]
   first_name = update["message"]["from"]["first_name"]
   sender_id = update["message"]["from"]["id"]
 
@@ -139,10 +138,11 @@ def telegram_bot():
     texto_resposta =f"{first_name}, Foram apresentados {qtd_proposicoes} projetos de Lei na Câmara Federal no último ano. \n Em média, o estado que mais apresentou PLs foi {estado_Pls}, o(a) deputado(a) que mais apresentou PLs foi {maior_autor}, já o que menos apresentou foi {menor_autor}"
   else:
     texto_resposta = "Não entendi!"
+    
   nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
  
   resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
-  print(resposta.text)
+  return "ok"
 
 @app.route("/")
 def hello_world():
