@@ -113,12 +113,10 @@ menu = """
 """
 
 @app.route("/sobre")
-conteudo = menu + """
 def sobre():
   return menu + "Aqui vai o conteúdo da página Sobre"
 
 @app.route("/contato")
-conteudo = menu + """
 def contato():
   return menu + "Aqui vai o conteúdo da página Contato"
 
