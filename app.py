@@ -49,6 +49,9 @@ gastos = despesas['vlrLiquido'].sum()
 
 #Quais deputados mais gastaram?
 gastadores = despesas.groupby(['txNomeParlamentar', 'sgUF'])['vlrLiquido'].sum()
+gastadores = pd.DataFrame(gastadores)
+gastadores = gastadores.reset_index()
+
 gastadoresBR_top10 = gastadores.nlargest(10)
 gastadoresBR_top10 = pd.DataFrame(gastadoresBR_top10)
 gastadoresBR_top10 = gastadoresBR_top10.reset_index()
