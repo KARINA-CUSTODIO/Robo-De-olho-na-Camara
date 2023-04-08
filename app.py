@@ -141,18 +141,23 @@ def telegram_bot():
   first_name = update["message"]["from"]["first_name"]
   sender_id = update["message"]["from"]["id"]
 
-  # Define qual será a resposta e enviada
+   # Define qual será a resposta e enviada
+  sheet.update('A:C', [message, 'recebido', sender_id])
+  resultado = sheet.get('A:C')
+
   mensagens = ['oi', 'Oi', 'Olá', 'olá', 'ola', 'iai', 'qual é', 'e aí', "/start" ]
   if message in mensagens:
     texto_resposta = f"Olá! Seja bem-vinda(o) {first_name}! Eu sou o robô de olho na Câmara, para saber o gasto e os Projetos de Lei de um(a) deputado(a) digite seu nome." 
-  elif message in sheet_gastadores:
-    filtro = sheet_gastadores.findall(message)
-    gasto = filtro.find('vlrLiquido')
-    texto_resposta = f'{first_name} o gasto de {message} foi igual a {gasto}'
-  elif message in sheet_autores:
-    filtro = sheet_autores.findall(message)
-    Pls = filtro.find('idProposicao')
-    texto_resposta = f'{first_name} {message} apresentou {PLs} no último ano'
+  elif message not in mensagens:
+    for message in resultado:
+      filtro = sheet_gastadores.findall(message)
+      gasto = filtro.find('vlrLiquido')
+      texto_resposta = f'{first_name} o gasto de {message} foi igual a {gasto}'
+  elif message not in mensagens:
+    for message in resultado:
+      filtro = sheet_autores.findall(message)
+      Pls = filtro.find('idProposicao')
+      texto_resposta = f'{first_name} {message} apresentou {PLs} no último ano'
 
     nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
     requests.post(f"https://api.telegram.org./bot{token}/sendMessage", data=nova_mensagem)
