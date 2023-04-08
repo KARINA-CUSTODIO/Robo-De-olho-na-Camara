@@ -39,7 +39,7 @@ baixar_arquivo('https://www.camara.leg.br/cotas/Ano-2022.csv.zip','CSV')
 #lendo arquivo  
 with zipfile.ZipFile('CSV') as z:
   with z.open('Ano-2022.csv') as f:
-    despesas = pd.read_csv(f, sep=';', skiprows = [i for i in range(1, 515), low_memory=False])
+    despesas = pd.read_csv(f, sep=';', skiprows = [i for i in range(1, 515))
     
 #tratando dados
 despesas['numMes'] = despesas['numMes'].astype(int)
