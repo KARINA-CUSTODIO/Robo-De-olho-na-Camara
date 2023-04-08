@@ -129,24 +129,7 @@ def contato():
   return menu + "Aqui vai o conteúdo da página Contato"
 
 @app.route("/telegram", methods=["POST"])
-def telegram_bot():
-     #extraindo dados para enviar mensagens
-  update = request.json
-  chat_id = update["message"]["chat"]["id"]
-  message = update["message"]["text"]
-  first_name = update["message"]["from"]["first_name"]
-  sender_id = update["message"]["from"]["id"]
 
-  # Define qual será a resposta e enviada
-def telegram_bot():
-  #extraindo dados para enviar mensagens
-  update = request.json
-  chat_id = update["message"]["chat"]["id"]
-  message = update["message"]["text"].split
-  first_name = update["message"]["from"]["first_name"]
-  sender_id = update["message"]["from"]["id"]
-
-  # Define qual será a resposta e enviada
 def telegram_bot():
   #extraindo dados para enviar mensagens
   update = request.json
