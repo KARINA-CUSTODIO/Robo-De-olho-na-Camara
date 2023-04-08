@@ -139,15 +139,15 @@ def telegram_bot():
   sender_id = update["message"]["from"]["id"]
 
   # Define qual será a resposta e enviada
-  mensagens = ['oi', 'Oi', 'Olá', 'olá', 'ola', 'iai', 'qual é', 'e aí', "/start" ]
+   mensagens = ['oi', 'Oi', 'Olá', 'olá', 'ola', 'iai', 'qual é', 'e aí', "/start" ]
   if message in mensagens:
     texto_resposta = f"Olá! Seja bem-vinda(o) {first_name}! Eu sou o robô de olho na Câmara, para saber o gasto e os Projetos de Lei de um(a) deputado(a) digite seu nome." 
   elif message in sheet_gastadores:
-    filtro = sheet_gastadores.find(message)
+    filtro = sheet_gastadores.findall(message)
     gasto = filtro.find('vlrLiquido')
     texto_resposta = f'{first_name} o gasto de {message} foi igual a {gasto}'
   elif message in sheet_autores:
-    filtro = sheet_autores.find(message)
+    filtro = sheet_autores.findall(message)
     Pls = filtro.find('idProposicao')
     texto_resposta = f'{first_name} {message} apresentou {PLs} no último ano'
 
