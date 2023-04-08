@@ -140,12 +140,12 @@ def telegram_bot():
   #extraindo dados para enviar mensagens
   update = request.json
   chat_id = update["message"]["chat"]["id"]
-  message = update["message"]["text"].split
+  message = update["message"]["text"]
   first_name = update["message"]["from"]["first_name"]
   sender_id = update["message"]["from"]["id"]
 
   # Define qual será a resposta e enviada
-  sheet.update('A:C', [message, 'recebido', sender_id])
+  sheet.update('A:C', [message])
   resultado = sheet.get('A:C')
 
   mensagens = ['oi', 'Oi', 'Olá', 'olá', 'ola', 'iai', 'qual é', 'e aí', "/start" ]
