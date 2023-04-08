@@ -10,6 +10,17 @@ import zipfile
 import altair as alt
 import plotly.express as px
 
+#Configurando acesso ao Telegram e Google sheets
+
+TELEGRAM_API_KEY = os.environ["TELEGRAM_API_KEY"]
+GOOGLE_SHEETS_CREDENTIALS = os.environ["GOOGLE_SHEETS_CREDENTIALS"]
+with open("credenciais.json", mode="w") as arquivo:
+  arquivo.write(GOOGLE_SHEETS_CREDENTIALS)
+conta = ServiceAccountCredentials.from_json_keyfile_name("credenciais.json")
+api = gspread.authorize(conta)
+planilha = api.open_by_key("1BTcO4G_FS1tp6_hRcPUk_4fts6ayt7Ms2cvYHsqD9nM")
+sheet = planilha.worksheet("dadosrobo")
+
 #Analisando gastos CEAP deputados Federais
 
 #Criando função que baixa arquivo
@@ -99,17 +110,6 @@ PLs_estados = PLs_estados.reset_index()
 estado_Pls = PLs_estados.iloc[0]['siglaUFAutor']
 
 #Criando robô no Telegram***
-
-#Configurando acesso ao Telegram e Google sheets
-
-TELEGRAM_API_KEY = os.environ["TELEGRAM_API_KEY"]
-GOOGLE_SHEETS_CREDENTIALS = os.environ["GOOGLE_SHEETS_CREDENTIALS"]
-with open("credenciais.json", mode="w") as arquivo:
-  arquivo.write(GOOGLE_SHEETS_CREDENTIALS)
-conta = ServiceAccountCredentials.from_json_keyfile_name("credenciais.json")
-api = gspread.authorize(conta)
-planilha = api.open_by_key("1BTcO4G_FS1tp6_hRcPUk_4fts6ayt7Ms2cvYHsqD9nM")
-sheet = planilha.worksheet("dadosrobo")
 
 # Criando site
   
