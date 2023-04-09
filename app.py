@@ -70,7 +70,7 @@ gastadores = gastadores.reset_index()
 menorgastador = gastadores.iloc[0]['txNomeParlamentar']
 
 #Levando dados do dataframe, pro Google sheets
-sheet_gastadores = planilha.get_worksheet(1)
+sheet_gastadores = planilha.get_worksheet(2)
 sheet_gastadores.update([gastadores.columns.values.tolist()] + gastadores.values.tolist())
 
 #Qual a média de gastos por deputado/a?
@@ -96,7 +96,7 @@ autores = autores.sort_values(by='idProposicao', ascending = False)
 autores = autores.reset_index()
 
 #Levando dados do dataframe, pro Google sheets
-sheet_autores = planilha.get_worksheet(2)
+sheet_autores = planilha.get_worksheet(1)
 sheet_autores.update([autores.columns.values.tolist()] + autores.values.tolist())
 
 maior_autor = autores.iloc[0]['nomeAutor']
@@ -137,47 +137,33 @@ def contato():
 @app.route("/telegram", methods=["POST"])
 
 def telegram_bot():
-  try:
-    # extraindo dados para enviar mensagens
-    update = request.json
-    chat_id = update["message"]["chat"]["id"]
-    message = update["message"]["text"]
-    first_name = update["message"]["from"]["first_name"]
-    sender_id = update["message"]["from"]["id"]
+  # extraindo dados para enviar mensagens
+  update = request.json
+  chat_id = update["message"]["chat"]["id"]
+  message = update["message"]["text"]
+  first_name = update["message"]["from"]["first_name"]
+  sender_id = update["message"]["from"]["id"]
     
-    # atualiza planilha com mensagens
-    sheet.update('A:B', [[message]])
-    resultado = sheet.get('A:B')
-    mensagem = resultado[-1][-1]
+  # atualiza planilha com mensagens
+  sheet.update('A:B', [[message]])
+  resultado = sheet.get('A:B')
+  mensagem = resultado[-1][-1]
 
-    mensagens = ['oi', 'Oi', 'Olá', 'olá', 'ola', 'iai', 'qual é', 'e aí', "/start"]
-    if menssagem in mensagens:
-      texto_resposta = f"Olá! Seja bem-vinda(o) {first_name}! Eu sou o robô de olho na Câmara, para saber o gasto e os Projetos de Lei de um(a) deputado(a) digite seu nome."
-    elif mensagem not in mensagens:
-      for mensagem in resultado:
-        linha = sheet_gastadores.find(mensagem).row
-        valores = sheet_gastadores.row_values(linha)
-        gastos = valores[2]
-        linha_dois = sheet_autores.find(mensagem).row
-        valores_dois = sheet_autores.row_values(linha_dois)
-        PLs = valores_dois[1]
-        texto_resposta = f'{first_name} {mensagem} apresentou {PLs} e gastou {gastos} no último ano'
+  mensagens = ['oi', 'Oi', 'Olá', 'olá', 'ola', 'iai', 'qual é', 'e aí', "/start"]
+  if menssagem in mensagens:
+    texto_resposta = f"Olá! Seja bem-vinda(o) {first_name}! Eu sou o robô de olho na Câmara, para saber o gasto e os Projetos de Lei de um(a) deputado(a) digite seu nome."
+  elif mensagem not in mensagens:
+    for mensagem in resultado:
+      linha = sheet_gastadores.find(mensagem).row
+      valores = sheet_gastadores.row_values(linha)
+      gastos = valores[2]
+      linha_dois = sheet_autores.find(mensagem).row
+      valores_dois = sheet_autores.row_values(linha_dois)
+      PLs = valores_dois[1]
+      texto_resposta = f'{first_name} {mensagem} apresentou {PLs} e gastou {gastos} no último ano'
 
     nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
     resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
-    new_func() Exception as e:
-    print(e)
-    texto_resposta = "Erro ao processar a mensagem"
-    nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
-    resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
-    print(resultado)
-    print(linha)
-    print(valores)
-    print(gasto)
-    print(PLs)
-
-def new_func():
-    except
     
 @app.route("/")
 def hello_world():
