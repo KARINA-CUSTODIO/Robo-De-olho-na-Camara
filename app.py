@@ -168,6 +168,7 @@ try:
     resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
     print(resposta.text)
     return "ok"
+  
   except:
     print(resultado)
     print(texto resposta)
