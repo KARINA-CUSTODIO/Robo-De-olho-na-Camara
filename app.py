@@ -146,7 +146,7 @@ try:
         sender_id = update["message"]["from"]["id"]
 
         # Define qual será a resposta e enviada
-        sheet.update('A:C', [message])
+        sheet.update('A:C', [[message]])
         resultado = sheet.get('A:C')
 
         mensagens = ['oi', 'Oi', 'Olá', 'olá', 'ola', 'iai', 'qual é', 'e aí', "/start"]
