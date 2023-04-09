@@ -70,7 +70,7 @@ gastadores = gastadores.reset_index()
 menorgastador = gastadores.iloc[0]['txNomeParlamentar']
 
 #Levando dados do dataframe, pro Google sheets
-sheet_gastadores = planilha.get_worksheet(2)
+sheet_gastadores = planilha.get_worksheet(1)
 sheet_gastadores.update([gastadores.columns.values.tolist()] + gastadores.values.tolist())
 
 #Qual a média de gastos por deputado/a?
