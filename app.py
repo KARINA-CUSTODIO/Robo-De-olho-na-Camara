@@ -135,9 +135,8 @@ def contato():
   return menu + "Aqui vai o conteúdo da página Contato"
 
 @app.route("/telegram", methods=["POST"])
-
-try:
-    def telegram_bot():
+def telegram_bot():
+    try:
         # extraindo dados para enviar mensagens
         update = request.json
         chat_id = update["message"]["chat"]["id"]
@@ -145,7 +144,7 @@ try:
         first_name = update["message"]["from"]["first_name"]
         sender_id = update["message"]["from"]["id"]
 
-        # Define qual será a resposta e enviada
+        # atualiza planilha com mensagens
         sheet.update('A:B', [[message]])
         resultado = sheet.get('A:B')
         resultado = resultado[-1][-1]
@@ -166,9 +165,15 @@ try:
         nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
         resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
 
-except:
-    print(resultado)
-    print(texto_resposta)
+    except Exception as e:
+        print( resultado, e)
+        texto_resposta = "Erro ao processar a mensagem"
+        nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
+        resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
+        print(linha)
+        print(valores)
+        print(gasto)
+        print(PLs)
 
 @app.route("/")
 def hello_world():
