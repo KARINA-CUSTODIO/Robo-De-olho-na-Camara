@@ -135,43 +135,42 @@ def contato():
   return menu + "Aqui vai o conteúdo da página Contato"
 
 @app.route("/telegram", methods=["POST"])
+
 try:
-  def telegram_bot():
-  #extraindo dados para enviar mensagens
-  update = request.json
-  chat_id = update["message"]["chat"]["id"]
-  message = update["message"]["text"]
-  first_name = update["message"]["from"]["first_name"]
-  sender_id = update["message"]["from"]["id"]
+    def telegram_bot():
+        # extraindo dados para enviar mensagens
+        update = request.json
+        chat_id = update["message"]["chat"]["id"]
+        message = update["message"]["text"]
+        first_name = update["message"]["from"]["first_name"]
+        sender_id = update["message"]["from"]["id"]
 
-  # Define qual será a resposta e enviada
-  sheet.update('A:C', [message])
-  resultado = sheet.get('A:C')
+        # Define qual será a resposta e enviada
+        sheet.update('A:C', [message])
+        resultado = sheet.get('A:C')
 
-  mensagens = ['oi', 'Oi', 'Olá', 'olá', 'ola', 'iai', 'qual é', 'e aí', "/start" ]
-  if message in mensagens:
-    texto_resposta = f"Olá! Seja bem-vinda(o) {first_name}! Eu sou o robô de olho na Câmara, para saber o gasto e os Projetos de Lei de um(a) deputado(a) digite seu nome." 
-  elif message not in mensagens:
-    for message in resultado:
-      linha = sheet_gastadores.find(message).row
-      valores = sheet_gastadores.row_values(linha)
-      gastos = valores[2]
-      texto_resposta = f'{first_name} o gasto de {message} foi igual a {gastos}'
-  elif message not in mensagens:
-    for message in resultado:
-      linha = sheet_autores.find('message').row
-      valores = sheet_autores.row_values(linha)
-      PLs = valores[1]
-      texto_resposta = f'{first_name} {message} apresentou {PLs} no último ano'
-      
-    nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
-    resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
-    print(resposta.text)
-    return "ok"
-  
-  except:
+        mensagens = ['oi', 'Oi', 'Olá', 'olá', 'ola', 'iai', 'qual é', 'e aí', "/start"]
+        if message in mensagens:
+            texto_resposta = f"Olá! Seja bem-vinda(o) {first_name}! Eu sou o robô de olho na Câmara, para saber o gasto e os Projetos de Lei de um(a) deputado(a) digite seu nome."
+        elif message not in mensagens:
+            for message in resultado:
+                linha = sheet_gastadores.find(message).row
+                valores = sheet_gastadores.row_values(linha)
+                gastos = valores[2]
+                texto_resposta = f'{first_name} o gasto de {message} foi igual a {gastos}'
+        elif message not in mensagens:
+            for message in resultado:
+                linha = sheet_autores.find('message').row
+                valores = sheet_autores.row_values(linha)
+                PLs = valores[1]
+                texto_resposta = f'{first_name} {message} apresentou {PLs} no último ano'
+
+        nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
+        resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
+
+except:
     print(resultado)
-    print(texto resposta)
+    print(texto_resposta)
 
 @app.route("/")
 def hello_world():
