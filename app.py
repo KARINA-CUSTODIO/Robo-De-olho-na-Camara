@@ -136,7 +136,7 @@ def contato():
 
 @app.route("/telegram", methods=["POST"])
 try:
-def telegram_bot():
+  def telegram_bot():
   #extraindo dados para enviar mensagens
   update = request.json
   chat_id = update["message"]["chat"]["id"]
