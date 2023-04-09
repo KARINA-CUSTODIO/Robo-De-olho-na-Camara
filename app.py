@@ -146,8 +146,9 @@ try:
         sender_id = update["message"]["from"]["id"]
 
         # Define qual será a resposta e enviada
-        sheet.update('A:C', [[message]])
-        resultado = sheet.get('A:C')
+        sheet.update('A:B', [[message]])
+        resultado = sheet.get('A:B')
+        resultado = resultado[-1][-1]
 
         mensagens = ['oi', 'Oi', 'Olá', 'olá', 'ola', 'iai', 'qual é', 'e aí', "/start"]
         if message in mensagens:
@@ -157,13 +158,10 @@ try:
                 linha = sheet_gastadores.find(message).row
                 valores = sheet_gastadores.row_values(linha)
                 gastos = valores[2]
-                texto_resposta = f'{first_name} o gasto de {message} foi igual a {gastos}'
-        elif message not in mensagens:
-            for message in resultado:
-                linha = sheet_autores.find('message').row
-                valores = sheet_autores.row_values(linha)
+                linha_dois = sheet_autores.find('message').row
+                valores = sheet_autores.row_values(linha_dois)
                 PLs = valores[1]
-                texto_resposta = f'{first_name} {message} apresentou {PLs} no último ano'
+                texto_resposta = f'{first_name} {message} apresentou {PLs} e gastou {gastos} no último ano'
 
         nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
         resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
