@@ -136,29 +136,41 @@ def contato():
 
 @app.route("/telegram", methods=["POST"])
 
-def telegram_bot():
-  #extraindo dados para enviar mensagens
-  update = request.json
-  chat_id = update["message"]["chat"]["id"]
-  message = update["message"]["text"]
-  first_name = update["message"]["from"]["first_name"]
-  sender_id = update["message"]["from"]["id"]
 
-  if message == "oi":
-    texto_resposta = f"Olá! Seja bem-vinda(o) {first_name}! O que gostaria de saber? \n 1 - Gastos dos deputados Federais no último ano? \n 2 - Projetos de Lei apresentados na Câmara Federal no último ano?"
-  elif message == "/start":
-    texto_resposta = f"Olá! Seja bem-vinda(o) {first_name}! O que gostaria de saber? \n 1 - Gastos dos deputados Federais no último ano? \n 2 - Projetos de Lei apresentados na Câmara Federal no último ano?"
-  elif message =='1':
-    texto_resposta =f"{first_name}, No último ano, o total gasto pelos(as) deputados federais foi igual à R${gastos}. \n A média de gastos da cota parlamentar por deputado(a) foi de R${mediaBr}, o(a) deputado(a) que mais gastou foi {maiorgastador}, o(a) que menos gastou foi {menorgastador}."
-  elif message =='2':
-    texto_resposta =f"{first_name}, Foram apresentados {qtd_proposicoes} projetos de Lei na Câmara Federal no último ano. \n Em média, o estado que mais apresentou PLs foi {estado_Pls}, o(a) deputado(a) que mais apresentou PLs foi {maior_autor}, já o que menos apresentou foi {menor_autor}"
-  else:
-    texto_resposta = "Não entendi!"
-    
-  nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
-  resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
-  print(resposta.text)
-  return "ok"
+def telegram_bot():
+  try:
+     # extraindo dados para enviar mensagens
+     update = request.json
+     chat_id = update["message"]["chat"]["id"]
+     message = update["message"]["text"]
+     first_name = update["message"]["from"]["first_name"]
+     sender_id = update["message"]["from"]["id"]
+     
+     # atualiza planilha com mensagens
+     sheet.update('A:B', [[message]])
+     resultado = sheet.get('A:B')
+     mensagem = resultado[-1][-1]
+  
+     mensagens = ['oi', 'Oi', 'Olá', 'olá', 'ola', 'iai', 'qual é', 'e aí', "/start"]
+     if mensagem in mensagens:
+        texto_resposta = f"Olá! Seja bem-vinda(o) {first_name}! Eu sou o robô de olho na Câmara, para saber o gasto e os Projetos de Lei de um(a) deputado(a) digite seu nome."
+     elif mensagem not in mensagens:
+      for mensagem in resultado:
+         linha = sheet_gastadores.find(mensagem).row
+         valores = sheet_gastadores.row_values(linha)
+         gastos = valores[2]
+         linha_dois = sheet_autores.find(mensagem).row
+         valores_dois = sheet_autores.row_values(linha_dois)
+         PLs = valores_dois[1]
+         texto_resposta = f'{first_name} {mensagem} apresentou {PLs} e gastou {gastos} no último ano'
+      
+     nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
+     resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
+    except Exception:
+     print(resultado)
+     print(mensagem)
+     print(linha)
+     print(linha_dois)
     
 @app.route("/")
 def hello_world():
