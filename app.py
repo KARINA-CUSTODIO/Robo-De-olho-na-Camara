@@ -68,10 +68,6 @@ gastadores = gastadores.reset_index()
 
 menorgastador = gastadores.iloc[0]['txNomeParlamentar']
 
-#Qual a média de gastos por deputado/a?
-def baixar_arquivo(url, endereco):
-autores = autores.reset_index()
-
 #Média de Gastos de deputados por estado
 estadosBr = despesas.groupby('sgUF')['vlrLiquido'].mean()
 estadosBr.sort_values(ascending=False)
