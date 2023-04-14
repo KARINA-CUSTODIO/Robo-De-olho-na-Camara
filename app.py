@@ -91,12 +91,12 @@ def telegram_bot():
     resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
   
   except Exception as e:
-  print(e)
-  texto_resposta = "Erro ao processar a mensagem"
-  nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
-  resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
-  print(resultado)
-  print(linha)
-  print(valores)
-  print(gasto)
-  print(PLs)
+    print(e)
+    texto_resposta = "Erro ao processar a mensagem"
+    nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
+    resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
+    print(resultado)
+    print(linha)
+    print(valores)
+    print(gasto)
+    print(PLs)
