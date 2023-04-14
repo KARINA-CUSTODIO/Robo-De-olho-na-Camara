@@ -111,6 +111,7 @@ def sobre():
 def contato():
   return menu + "Aqui vai o conteúdo da página Contato"
 
+@app.route("/telegram", methods=["POST"])
 def telegram_bot():
   try:
     # extraindo dados para enviar mensagens
