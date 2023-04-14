@@ -18,28 +18,85 @@ api = gspread.authorize(conta)
 planilha = api.open_by_key("1BTcO4G_FS1tp6_hRcPUk_4fts6ayt7Ms2cvYHsqD9nM")
 sheet = planilha.get_worksheet(3)
 
-def projetos():
-  #extraindo projetos de Lei e requerimentos
-  resposta = requests.get('https://al.to.leg.br/materiasLegislativas')
-  sopa = BeautifulSoup(resposta.content, 'html.parser')
-  PLs = sopa.findAll('div', {'class':'row'}) 
-  PL = []
-  for pl in PLs:
-    try:
-      titulo = pl.find('h4').text
-    except AttributeError:
-      print(pl)
-    continue
-    try:
-      data = pl.find('p').text.split('|')[1].split(':')[1].strip()
-    except:
-      print(pl) # print para vermos o que tinha na linha que deu erro
-    break
-    texto = pl.find_all('div', class_= 'col-12')[-1].text
-    path = pl.find('a').attrs['href']
-    url = f'https://al.to.leg.br{path}'
-    PL.append([titulo, data, texto, url])
-    return PL
+#Criando função que baixa arquivo
+def baixar_arquivo(url, endereco):
+    resposta = requests.get(url)
+    if resposta.status_code == requests.codes.OK:
+        with open(endereco, 'wb') as novo_arquivo:
+            novo_arquivo.write(resposta.content)
+        print("Donwload finalizado. Salvo em: {}".format(endereco))
+    else:
+        resposta.raise_for_status()
+        
+#baixando arquivo despesas
+baixar_arquivo('https://www.camara.leg.br/cotas/Ano-2022.csv.zip','CSV')
+
+with zipfile.ZipFile('/content/CSV') as z:
+  print(z.namelist(),sep='\n')
+
+with zipfile.ZipFile('/content/CSV') as z:
+  with z.open('Ano-2022.csv') as f:
+    despesas = pd.read_csv(f, sep=';', low_memory=False)
+    
+despesas['numMes'] = despesas['numMes'].astype(int)
+
+gastos = despesas['vlrLiquido'].sum()
+
+#Quais deputados mais gastaram?
+gastadores = despesas.groupby(['txNomeParlamentar', 'sgUF'])['vlrLiquido'].sum()
+gastadoresBR_top10 = gastadores.nlargest(10, keep='first')
+gastadoresBR_top10 = pd.DataFrame(gastadoresBR_top10)
+gastadoresBR_top10 = gastadoresBR_top10.reset_index()
+gastadoresBR_top10
+
+gastadores = despesas.groupby(['txNomeParlamentar', 'sgUF'])['vlrLiquido'].sum()
+gastadores = pd.DataFrame(gastadores)
+gastadores = gastadores.reset_index()
+
+#Levando dados do dataframe, pro Google sheets
+sheet_gastadores = planilha.get_worksheet(2)
+sheet_gastadores.update([gastadores.columns.values.tolist()] + gastadores.values.tolist())
+
+#Deputado/a que mais gastou
+maiorgastador = gastadoresBR_top10.iloc[0]['txNomeParlamentar']
+
+#Deputado/a que menos gastou
+gastadores = despesas.groupby(['txNomeParlamentar', 'sgUF'])['vlrLiquido'].sum()
+gastadores = pd.DataFrame(gastadores)
+gastadores = gastadores.sort_values(by='vlrLiquido')
+gastadores = gastadores.reset_index()
+
+menorgastador = gastadores.iloc[0]['txNomeParlamentar']
+
+#Qual a média de gastos por deputado/a?
+def baixar_arquivo(url, endereco):
+autores = autores.reset_index()
+
+#Média de Gastos de deputados por estado
+estadosBr = despesas.groupby('sgUF')['vlrLiquido'].mean()
+estadosBr.sort_values(ascending=False)
+estados = pd.DataFrame(estadosBr)
+estados = estados.reset_index()
+
+#Analisando PLs
+
+baixar_arquivo('https://dadosabertos.camara.leg.br/arquivos/proposicoesAutores/csv/proposicoesAutores-2022.csv','proposicoesAutores-2022.csv')
+proposicoes = pd.read_csv('proposicoesAutores-2022.csv',
+                          sep = ';', low_memory=False)
+
+#Quais deputados mais apresentaram PLs?
+autores = proposicoes.groupby('nomeAutor').count()
+autores = pd.DataFrame(autores)
+autores = autores.sort_values(by='idProposicao', ascending = False)
+autores = autores.reset_index()
+
+#Levando dados do dataframe, pro Google sheets
+sheet_autores = planilha.get_worksheet(1)
+sheet_autores.update([autores.columns.values.tolist()] + autores.values.tolist())
+
+maior_autor = autores.iloc[0]['nomeAutor']
+
+menor_autor = autores.iloc[-1]['nomeAutor']
 
 # Criando site
 
@@ -57,8 +114,6 @@ def sobre():
 @app.route("/contato")
 def contato():
   return menu + "Aqui vai o conteúdo da página Contato"
-
-@app.route("/telegram", methods=["POST"])
 
 def telegram_bot():
   try:
