@@ -114,32 +114,31 @@ def contato():
 
 @app.route("/telegram", methods=["POST"])
 def telegram_bot():
-  #extraindo dados para enviar mensagens
-  update = request.json
-  chat_id = update["message"]["chat"]["id"]
-  message = update["message"]["text"]
-  first_name = update["message"]["from"]["first_name"]
-  sender_id = update["message"]["from"]["id"]
-
-  mensagens = ['oi', 'Oi', 'Olá', 'olá', 'ola', 'iai', 'qual é', 'e aí', "/start"]
-  if mensagem in mensagens:
-    texto_resposta = f"Olá! Seja bem-vinda(o) {first_name}! O que gostaria de saber? \n 1 - Gastos dos deputados Federais no último ano? \n 2 - Projetos de Lei apresentados na Câmara Federal no último ano?"
-  elif message =='1':
-    texto_resposta =f"{first_name}, No último ano, o total gasto pelos(as) deputados federais foi igual à R${gastos}. \n A média de gastos da cota parlamentar por deputado(a) foi de R${mediaBr}, o(a) deputado(a) que mais gastou foi {maiorgastador}, o(a) que menos gastou foi {menorgastador}."
-  elif message =='2':
-    texto_resposta =f"{first_name}, Foram apresentados {qtd_proposicoes} projetos de Lei na Câmara Federal no último ano. \n Em média, o estado que mais apresentou PLs foi {estado_Pls}, o(a) deputado(a) que mais apresentou PLs foi {maior_autor}, já o que menos apresentou foi {menor_autor}"
-  else:
-    texto_resposta = "Não entendi!"
+  try:
+    #extraindo dados para enviar mensagens
+    update = request.json
+    chat_id = update["message"]["chat"]["id"]
+    message = update["message"]["text"]
+    first_name = update["message"]["from"]["first_name"]
+    sender_id = update["message"]["from"]["id"]
+    
+    mensagens = ['oi', 'Oi', 'Olá', 'olá', 'ola', 'iai', 'qual é', 'e aí', "/start"]
+    if mensagem in mensagens:
+       texto_resposta = f"Olá! Seja bem-vinda(o) {first_name}! O que gostaria de saber? \n 1 - Gastos dos deputados Federais no último ano? \n 2 - Projetos de Lei apresentados na Câmara Federal no último ano?"
+    elif message =='1':
+       texto_resposta =f"{first_name}, No último ano, o total gasto pelos(as) deputados federais foi igual à R${gastos}. \n A média de gastos da cota parlamentar por deputado(a) foi de R${mediaBr}, o(a) deputado(a) que mais gastou foi {maiorgastador}, o(a) que menos gastou foi {menorgastador}."
+    elif message =='2':
+       texto_resposta =f"{first_name}, Foram apresentados {qtd_proposicoes} projetos de Lei na Câmara Federal no último ano. \n Em média, o estado que mais apresentou PLs foi {estado_Pls}, o(a) deputado(a) que mais apresentou PLs foi {maior_autor}, já o que menos apresentou foi {menor_autor}"
+    else:
+       texto_resposta = "Não entendi!"
     
   nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
- 
   resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
   print(resposta.text)
   return "ok"
 
   except Exception as e:
-     print(e)
-     texto_resposta = "Erro ao processar a mensagem"
-     nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
-     resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
-    
+    print(e)
+    texto_resposta = "Erro ao processar a mensagem"
+    nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
+    resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
