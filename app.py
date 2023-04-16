@@ -32,10 +32,10 @@ def baixar_arquivo(url, endereco):
 #baixando arquivo despesas
 baixar_arquivo('https://www.camara.leg.br/cotas/Ano-2022.csv.zip','CSV')
 
-with zipfile.ZipFile('/content/CSV') as z:
+with zipfile.ZipFile('CSV') as z:
   print(z.namelist(),sep='\n')
 
-with zipfile.ZipFile('/content/CSV') as z:
+with zipfile.ZipFile('CSV') as z:
   with z.open('Ano-2022.csv') as f:
     despesas = pd.read_csv(f, sep=';', low_memory=False)
     
