@@ -150,5 +150,5 @@ def telegram_bot():
     print(resultado)
     print(linha)
     print(valores)
-    print(gasto)
+    print(gastos)
     print(PLs)
