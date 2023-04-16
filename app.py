@@ -4,7 +4,6 @@ import os
 import gspread
 import requests
 from flask import Flask, request
-from bs4 import BeautifulSoup
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
