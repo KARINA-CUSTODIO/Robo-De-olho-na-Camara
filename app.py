@@ -127,30 +127,30 @@ def telegram_bot():
     resultado = sheet.get('A:B')
     mensagem = resultado[-1][-1]
     
-  linha = None  # adiciona a definição inicial de 'linha'
-  mensagens = ['oi', 'Oi', 'Olá', 'olá', 'ola', 'iai', 'qual é', 'e aí', "/start"]
-  if mensagem in mensagens:
-    texto_resposta = f"Olá! Seja bem-vinda(o) {first_name}! Eu sou o robô de olho na Câmara, para saber o gasto e os Projetos de Lei de um(a) deputado(a) digite seu nome."
-  else:
-    linha = sheet_gastadores.find(mensagem).row
-    valores = sheet_gastadores.row_values(linha)
-    gastos = valores[2]
-    linha_dois = sheet_autores.find(mensagem).row
-    valores_dois = sheet_autores.row_values(linha_dois)
-    PLs = valores_dois[1]
-    for mensagem in resultado:
-       texto_resposta = f'{first_name} {mensagem} apresentou {PLs} e gastou {gastos} no último ano'
-
+    linha = None  # adiciona a definição inicial de 'linha'
+    mensagens = ['oi', 'Oi', 'Olá', 'olá', 'ola', 'iai', 'qual é', 'e aí', "/start"]
+    if mensagem in mensagens:
+       texto_resposta = f"Olá! Seja bem-vinda(o) {first_name}! Eu sou o robô de olho na Câmara, para saber o gasto e os Projetos de Lei de um(a) deputado(a) digite seu nome."
+    else:
+      linha = sheet_gastadores.find(mensagem).row
+      valores = sheet_gastadores.row_values(linha)
+      gastos = valores[2]
+      linha_dois = sheet_autores.find(mensagem).row
+      valores_dois = sheet_autores.row_values(linha_dois)
+      PLs = valores_dois[1]
+      for mensagem in resultado:
+         texto_resposta = f'{first_name} {mensagem} apresentou {PLs} e gastou {gastos} no último ano'
+    
     nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
     resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
   
   except Exception as e:
-    print(e)
-    texto_resposta = "Erro ao processar a mensagem"
-    nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
-    resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
-    print(resultado)
-    print(linha)
-    print(valores)
-    print(gastos)
-    print(PLs)
+     print(e)
+     texto_resposta = "Erro ao processar a mensagem"
+     nova_mensagem = {"chat_id": chat_id, "text": texto_resposta}
+     resposta = requests.post(f"https://api.telegram.org./bot{TELEGRAM_API_KEY}/sendMessage", data=nova_mensagem)
+     print(resultado)
+     print(linha)
+     print(valores)
+     print(gastos)
+     print(PLs)
